@@ -1,0 +1,285 @@
+name "SOS GAME BY ECE KAYA"
+org 100h
+ 
+.DATA
+    tablo db '1','2','3'  
+         db '4','5','6'
+         db '7','8','9'
+         
+    oyuncu db ?  
+    ilk_Mesaj db 'SOS GAME BY ECE! $'   
+    mesaj_giris db 'Pozisyon giriniz, Oyuncu $ '
+    berabereKalan db 'Berabere :) $'
+    kazananKisi db 'Kazanan: $'  
+    
+.CODE
+
+main:
+    mov cx,9  
+     dongu1:   
+     call ekran_yenile  
+     call ilkMesaj
+     call tabloYaz
+            
+     mov bx, cx
+     and bx, 1       
+     cmp bx, 0 
+     
+     je ciftse        
+     mov oyuncu,'S'  
+     jmp girisleriAl
+     ciftse:
+     mov oyuncu,'O'
+       
+     girisleriAl:
+     call kullanici_giris
+     call girileni_okuma
+        
+     push cx
+     mov cx, 9
+     mov bx, 0
+     
+                
+     dongu2:
+     cmp tablo[bx],al    
+     je guncelle          
+     jmp devam
+     guncelle:
+     mov dl,oyuncu       
+     mov tablo[bx],dl  
+     devam:
+     inc bx
+     loop dongu2
+     pop cx
+     call kazanan_kontrol        
+              
+
+    loop dongu1  
+
+    jmp oyunSonu 
+    
+    
+    
+ilkMesaj:
+    lea dx, ilk_Mesaj 
+    mov ah, 9             
+    int 21h
+    ret 
+    
+kullanici_giris:
+    lea dx, mesaj_giris    
+    mov ah, 9           
+    int 21h
+    mov dl, oyuncu      
+    sub al, 30h   
+    mov ah, 2h  
+    int 21h 
+    call bosluk
+    ret
+    
+
+ekran_yenile:
+    mov ax, 3   
+    int 10h
+    ret             
+
+
+tabloYaz:
+    push cx      
+    mov bx,0
+    mov cx,3
+    x1:
+    call yeni_satir 
+    push cx         
+    mov cx, 3
+    x2:
+    mov dl, tablo[bx]  
+    sub al, 30h   
+    mov ah, 2h   
+    int 21h
+    call bosluk              
+    inc bx       
+    loop x2
+    pop cx                    
+    loop x1
+    pop cx
+    call yeni_satir                        
+    ret 
+    
+yeni_satir:
+    mov dl, 0ah      
+    mov ah, 2        
+    int 21h
+    mov dl, 13      
+    mov ah, 2        
+    int 21h
+    ret 
+        
+bosluk:
+    mov dl, 32       
+    mov ah, 2         
+    int 21h
+    ret
+
+girileni_okuma:
+   mov ah, 1 
+   int 21h
+    
+ret
+
+
+beraberlik:
+    mov ah, 06h        
+    mov al, 00h        
+    mov bh, 10h        
+    mov cx, 0          
+    mov dx, 184Fh      
+    int 10h            
+    call yeni_satir
+    lea dx, berabereKalan  
+    mov ah, 9             
+    int 21h
+    ret
+
+kazanan:
+    mov ah, 06h       
+    mov al, 00h        
+    mov bh, 20h        
+    mov cx, 0          
+    mov dx, 184Fh      
+    int 10h            
+    call yeni_satir
+    call tabloYaz 
+    lea dx, kazananKisi  
+    mov ah, 9             
+    int 21h
+    mov dl, oyuncu 
+    sub al, 30h   
+    mov ah, 2h  
+    int 21h
+    jmp bitis_program
+    ret
+
+
+kazanan_kontrol:
+    mov bl, tablo[0]    
+    cmp bl, 'S' 
+    jne atla1
+        
+    mov bl, tablo[2]
+    cmp bl,'S'
+    jne atla1 
+    
+    mov bl, tablo[1]
+    cmp bl,'O'
+    je kazanan
+    
+    
+    atla1:
+    
+    mov bl, tablo[3]     
+    cmp bl, 'S' 
+    jne atla2
+        
+    mov bl, tablo[5]
+    cmp bl,'S'
+    jne atla2
+    
+    mov bl, tablo[4]
+    cmp bl,'O'
+    je kazanan
+    
+    atla2: 
+    
+    mov bl, tablo[6]     
+    cmp bl, 'S' 
+    jne atla3
+        
+    mov bl, tablo[8]
+    cmp bl,'S'
+    jne atla3
+    
+    mov bl, tablo[7]
+    cmp bl,'O'
+    je kazanan
+    
+    atla3: 
+    
+    mov bl, tablo[0]     
+    cmp bl, 'S' 
+    jne atla4
+        
+    mov bl, tablo[6]
+    cmp bl,'S'
+    jne atla4 
+    
+    mov bl, tablo[3]
+    cmp bl,'O'
+    je kazanan
+    
+    atla4:   
+    
+    mov bl, tablo[1]     
+    cmp bl, 'S' 
+    jne atla5
+        
+    mov bl, tablo[7]
+    cmp bl,'S'
+    jne atla5 
+    
+    mov bl, tablo[4]
+    cmp bl,'O'
+    je kazanan
+    atla5:
+    
+    mov bl, tablo[2]     
+    cmp bl, 'S' 
+    jne atla6
+        
+    mov bl, tablo[8]
+    cmp bl,'S'
+    jne atla6 
+    
+    mov bl, tablo[5]
+    cmp bl,'O'
+    je kazanan
+    atla6:
+    
+    mov bl, tablo[0]     
+    cmp bl, 'S' 
+    jne atla7
+        
+    mov bl, tablo[8]
+    cmp bl,'S'
+    jne atla7 
+    
+    mov bl, tablo[4]
+    cmp bl,'O'
+    je kazanan
+    atla7:
+    
+    mov bl, tablo[2]     
+    cmp bl, 'S' 
+    jne atla8
+        
+    mov bl, tablo[6]
+    cmp bl,'S'
+    jne atla8 
+    
+    mov bl, tablo[4]
+    cmp bl,'O'
+    je kazanan 
+    
+    atla8:             
+ret    
+
+
+oyunSonu:
+    call beraberlik   
+    
+    bitis_program:   
+    mov     ah, 0    
+    int     16h      
+    ret 
+    
+end main
